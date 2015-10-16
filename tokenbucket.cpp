@@ -16,31 +16,32 @@ public:
   }
   bool getToken() {
      auto now = high_resolution_clock::now();
-     tokens += (int)(duration_cast<milliseconds>(now-lasttime).count()* tokenps / 1000);
+     tokens += (duration_cast<milliseconds>(now-lasttime).count() * tokenps / 1000);
      if (tokens > capacity) tokens = capacity;
      lasttime = now;
-     if (tokens < 1) return false;
-     tokens--;
+     if (tokens < 1.0) return false;
+     tokens = tokens - 1.0;
      return true;
   }
 private:
   int capacity;
   int tokenps;
-  int tokens;
+  double tokens;
   high_resolution_clock::time_point lasttime;
 };
 
 int main() {
   TokenBucket bucket(4, 4);
-  sleep_for(milliseconds(1000));
-  for (int i = 0; i < 5; i++) {
-    if (bucket.getToken()) cout << "1" << endl;
-    else cout << "0" << endl;
-  }
-  sleep_for(milliseconds(1000));
-  for (int i = 0; i < 5; i++) {
-    if (bucket.getToken()) cout << "1" << endl;
-    else cout << "0" << endl;
+  int counter = 0;
+  while(1) {
+     sleep_for(milliseconds(1000));
+     cout << "#" << counter << ": ";
+     counter++;
+     for (int i = 0; i < 5; i++) {
+        if (bucket.getToken()) cout << "1 ";
+        else cout << "0 ";
+     }
+     cout << endl;
   }
   return 0;
 }
